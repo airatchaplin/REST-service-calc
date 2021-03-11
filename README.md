@@ -28,7 +28,7 @@ rest service calculator
 
 и получаем ответ в виде:
 
-"ExpressionDTO : expression = '(2+3)/6', precision = '5', time = 23:58:56.665178600, date = 2021-03-11 Ответ = 0.83333"
+"ExpressionDTO : expression = '(2+3)/6', precision = '5', time = 00:10:22.640663400, date = 2021-03-12 Ответ = 0.83333"
 
 Вычисленные выражения кешируются в коллекцию, и по достижению размера = 10 испольуется стратегия FIFO 
 
@@ -46,7 +46,7 @@ rest service calculator
             
             "precision": "5",
             
-            "time": "00:00:57",
+            "time": "00:10:22",
             
             "date": "2021-03-12"
             
