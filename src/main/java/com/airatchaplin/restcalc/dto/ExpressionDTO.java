@@ -1,10 +1,9 @@
 package com.airatchaplin.restcalc.dto;
 
 import lombok.Data;
-
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Objects;
 
 @Data
 public class ExpressionDTO {
@@ -12,13 +11,16 @@ public class ExpressionDTO {
     String precision;
     LocalTime time;
     LocalDate date;
+    BigDecimal answer;
 
     @Override
     public String toString() {
-        return "ExpressionDTO : " +
-                "expression = '" + expression + '\'' +
-                ", precision = '" + precision + '\'' +
-                ", time = " + time +
-                ", date = " + date;
+        return "ExpressionDTO{" +
+                "expression='" + expression + '\'' +
+                ", precision='" + precision + '\'' +
+                ", time=" + time +
+                ", date=" + date +
+                ", answer=" + answer +
+                '}';
     }
 }

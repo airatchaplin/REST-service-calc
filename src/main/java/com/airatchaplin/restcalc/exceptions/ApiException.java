@@ -7,7 +7,6 @@ public class ApiException {
     private final String massage;
     private final HttpStatus httpStatus;
 
-
     public ApiException(String massage, HttpStatus httpStatus) {
         this.massage = massage;
         this.httpStatus = httpStatus;

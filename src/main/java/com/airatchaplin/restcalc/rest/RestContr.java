@@ -6,11 +6,13 @@ import com.airatchaplin.restcalc.model.Expression;
 import com.airatchaplin.restcalc.service.CalcService;
 import com.airatchaplin.restcalc.service.ExpressionService;
 import com.airatchaplin.restcalc.service.UserService;
-import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.math.BigDecimal;
 
 @RestController
 public class RestContr {
@@ -24,35 +26,50 @@ public class RestContr {
     @Autowired
     UserService userService;
 
-    ArrayList<String> list = new ArrayList<>(10);
+    @Autowired
+    @Qualifier("userDetailsServiceImpl")
+    UserDetailsService userDetailsService;
 
-    @PostMapping("/add")
-    public List<String> add(@RequestBody Expression expression) throws Exception {
-        double result = 0;
-        if (calcService.isValid(expression.getExpression())) {
-            result = calcService.getAnswer(calcService.ReversePolishNotation(expression.getExpression()));
-            result = calcService.roundAvoid(result, Integer.parseInt(expression.getPrecision()));
-        }
-
-        ExpressionDTO expressionDTO = expressionService.setExpressionDTO(expression);
-        String allAnswer = expressionDTO.toString() + " Ответ = " + result;
-        if (list.size()<10){
-            list.add(allAnswer);
-        }else {
-            for (String s : list){
-                list.remove(s);
-                list.add(allAnswer);
-                break;
-            }
-        }
-
-        expressionService.addExpressionForUser(expression);
-        return list;
+    @PostMapping("/login")
+    void login(@RequestParam("username") String username){
+        userDetailsService.loadUserByUsername(username);
     }
 
-    @GetMapping("/{username}")
-    public UserDTO show(@PathVariable String username) throws NotFoundException {
-        return userService.getUserDTO(username);
+    @GetMapping("/home")
+    public String homePage(){
+        User user;
+        String username ="";
+        try {
+            user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            username = user.getUsername();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+       if (username.equals("")) {
+           return "Hello unauthorized";
+       }else {
+           return "Hello " + username;
+       }
+    }
+
+    @PostMapping("/api/addExpression")
+    public ExpressionDTO add(@RequestBody Expression expression){
+        BigDecimal result;
+        result =expressionService.chekingExpressionInDataBase(expression.getExpression());
+        if (result == null) {
+            if (calcService.isValid(expression.getExpression())) {
+                result = calcService.getAnswer(calcService.ReversePolishNotation(expression.getExpression()));
+                result = calcService.roundAvoid(result, Integer.parseInt(expression.getPrecision()));
+            }
+        }
+        ExpressionDTO expressionDTO = expressionService.setExpressionDTO(expression, result);
+        expressionService.addExpressionForUser(expression, result);
+        return expressionDTO;
+    }
+
+    @GetMapping("/api/show/{username}")
+    public UserDTO show(@PathVariable String username){
+            return userService.getUserDTO(username);
     }
 
 }

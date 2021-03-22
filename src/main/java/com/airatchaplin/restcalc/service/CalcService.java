@@ -1,15 +1,18 @@
 package com.airatchaplin.restcalc.service;
 
 import org.springframework.stereotype.Service;
-
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Stack;
 
 @Service
 public class CalcService {
 
-    public double roundAvoid(double value, int places) {
-        double scale = Math.pow(10, places);
-        return Math.round(value * scale) / scale;
+    public BigDecimal roundAvoid(BigDecimal value, int places) {
+        String result =  value.setScale(places, RoundingMode.FLOOR).toString();
+        double d = Double.parseDouble(result);
+        result = String.valueOf(d);
+        return new BigDecimal(result);
     }
 
     public String ReversePolishNotation(String s) {
@@ -45,8 +48,8 @@ public class CalcService {
         return result.toString();
     }
 
-    public Double getAnswer(String s) {
-        Stack<Double> stack = new Stack<>();
+    public BigDecimal getAnswer(String s) {
+        Stack<BigDecimal> stack = new Stack<>();
         StringBuilder string = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
             if (s.charAt(i) == ' ') {
@@ -58,31 +61,33 @@ public class CalcService {
                     string.append(s.charAt(i++));
 
                 }
-                stack.push(Double.parseDouble(string.toString()));
+                stack.push(new BigDecimal(String.valueOf(string)));
                 string = new StringBuilder("");
             }
             if (getPriority(s.charAt(i)) > 1) {
-                double a = stack.pop();
-                double b = stack.pop();
+                BigDecimal a = stack.pop();
+                BigDecimal b = stack.pop();
 
                 if (s.charAt(i) == '+') {
-                    stack.push(b + a);
+                    stack.push(a.add(b));
                 }
                 if (s.charAt(i) == '-') {
-                    stack.push(b - a);
+                    stack.push(b.subtract(a));
                 }
                 if (s.charAt(i) == '/') {
-                    if (a == 0 || a == 0.0) {
+                    if (a.toString().equals("0") || a.toString().equals("0.0")) {
                         throw new ArithmeticException("Ошибка, деление на 0!");
                     } else {
-                        stack.push(b / a);
+                        BigDecimal divideResult = (b).divide(a,100,RoundingMode.FLOOR);
+                        stack.push(divideResult);
                     }
                 }
                 if (s.charAt(i) == '*') {
-                    stack.push(b * a);
+
+                    stack.push(b.multiply(a));
                 }
                 if (s.charAt(i) == '^') {
-                    stack.push(Math.pow(b, a));
+                    stack.push(b.pow(Integer.parseInt(a.toString())));
                 }
             }
 

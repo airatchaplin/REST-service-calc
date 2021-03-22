@@ -1,8 +1,10 @@
 package com.airatchaplin.restcalc.model;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Set;
 
 @Entity
 @Table(name = "expression")
@@ -20,16 +22,19 @@ public class Expression {
 
     private LocalDate date;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    private User user;
+    private BigDecimal answer;
 
-    public Expression(String expression, String precision) {
-        this.expression = expression;
-        this.precision = precision;
+    @ManyToMany(cascade = CascadeType.ALL)
+    private Set<User> user;
+
+    public Expression() {}
+
+    public BigDecimal getAnswer() {
+        return answer;
     }
 
-    public Expression() {
-
+    public void setAnswer(BigDecimal answer) {
+        this.answer = answer;
     }
 
     public Long getId() {
@@ -56,11 +61,11 @@ public class Expression {
         this.precision = precision;
     }
 
-    public User getUser() {
+    public Set<User> getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(Set<User> user) {
         this.user = user;
     }
 
@@ -85,6 +90,7 @@ public class Expression {
         return "Expression{" +
                 "expression='" + expression + '\'' +
                 ", precision='" + precision + '\'' +
+                ", answer=" + answer +
                 '}';
     }
 }
